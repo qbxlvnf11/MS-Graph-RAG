@@ -1,4 +1,5 @@
 project_root_folder: "rag_db/test_version"
 community_level: 2
+dynamic_community_selection: False
 response_type: "Multiple Paragraphs"
-streaming: false
+# streaming: false

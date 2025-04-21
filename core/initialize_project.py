@@ -56,7 +56,7 @@ def initialize_custom_project(path: Path, force: bool) -> None:
     prompts_dir = root / "prompts"
     if not prompts_dir.exists():
         prompts_dir.mkdir(parents=True, exist_ok=True)
-
+    
     prompts = {
         "extract_graph": GRAPH_EXTRACTION_PROMPT,
         "summarize_descriptions": SUMMARIZE_PROMPT,
@@ -79,3 +79,4 @@ def initialize_custom_project(path: Path, force: bool) -> None:
             with prompt_file.open("wb") as file:
                 file.write(content.encode(encoding="utf-8", errors="strict"))
                 progress_logger.info(f"Create prompt files({prompt_file})")
+            

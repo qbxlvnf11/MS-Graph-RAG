@@ -24,5 +24,7 @@ bitsandbytes
 deepspeed
 openai
 tiktoken
+fastapi
+uvicorn
 chunker
 networkx

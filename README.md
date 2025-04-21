@@ -53,3 +53,14 @@ python run_query.py --system_config_path {system_config_path} --search_method {s
 Web Test
 =============
 
+### - Run Chat Server
+
+```
+python chat_server.py --server_port {server_port} --rag_root_folder {rag_root_folder_path}
+```
+
+### - Run Client Server
+
+```
+python client_server.py --server_port {server_port} --client_port {client_port}
+```

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RAG Client</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    select, input, button {
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    #query {
+      margin-top: 0.5rem;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid #ccc;
+      width: 80%;
+      min-height: 100px;
+      white-space: pre-wrap;
+    }
+    #response, #sources, #entities, #relationships, #reports {
+      margin-top: 0.5rem;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid #ccc;
+      min-height: 200px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Chat-Bot Client</h1>
+
+  <label for="query">Query</label>
+  <!-- <input type="text" id="query" placeholder="Enter your question"/> -->
+  <textarea id="query" placeholder="Enter your question"></textarea>
+
+  <label for="rag_version">RAG Version</label>
+  <select id="rag_version">
+    <!-- <option value="v1">v1</option> -->
+    <option value="test_version">test_version</option>
+  </select>
+
+  <label for="llm_version">LLM Version</label>
+  <select id="llm_version">
+    <option value="gpt-4o">GPT-4o</option>
+    <option value="gpt-4.1">GPT-4.1</option>
+  </select>
+
+  <label for="search_method">Search Method</label>
+  <select id="search_method">
+    <option value="local">Local</option>
+    <option value="global">Global</option>
+  </select>
+
+  <label for="response_type">Response Type</label>
+  <select id="response_type">
+    <option value="Multiple Paragraphs">Multiple Paragraphs</option>
+  </select>
+
+  <label for="language">Language</label>
+  <select id="language">
+    <option value="local">Korean</option>
+    <option value="global">English</option>
+  </select>
+
+  <button onclick="sendQuery()">Send</button>
+
+  <label for="response">Response</label>
+  <div id="response">Waiting for response...</div>
+
+  <label for="sources">Sources</label>
+  <div id="sources">Waiting for response..</div>
+
+  <label for="entities">Entities</label>
+  <div id="entities">Waiting for response..</div>
+
+  <label for="relationships">Relationships</label>
+  <div id="relationships">Waiting for response..</div>
+
+  <label for="reports">Reports</label>
+  <div id="reports">Waiting for response..</div>
+
+  <script>
+
+    async function sendQuery() {
+      const query = document.getElementById("query").value;
+      const llm_version = document.getElementById("llm_version").value;
+      const rag_version = document.getElementById("rag_version").value;
+      const search_method = document.getElementById("search_method").value;
+      const response_type = document.getElementById("response_type").value;
+      const language = document.getElementById("language").value;
+      const responseBox = document.getElementById("response");
+      const sourcesBox = document.getElementById("sources");
+      const entitiesBox = document.getElementById("entities");
+      const relationshipsBox = document.getElementById("relationships");
+      const reportsBox = document.getElementById("reports");
+
+      responseBox.textContent = "Loading...";
+      sourcesBox.textContent = "Loading...";
+      entitiesBox.textContent = "Loading...";
+      relationshipsBox.textContent = "Loading...";
+      reportsBox.textContent = "Loading...";
+
+      const data = JSON.parse('{{ data | tojson | safe }}');
+      const server_port = data.server_port; //null;
+      
+      const response = await fetch("http://0.0.0.0:" + server_port + "/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "query":query,
+          "llm_version":llm_version,
+          "rag_version":rag_version,
+          "search_method":search_method,
+          "response_type":response_type,
+          "language":language
+        })
+      });
+
+      if (!response.body) {
+        responseBox.textContent = "No response body!";
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      let responseFullText = "";
+      let sourcesFullText = "";
+      let entieisFullText = "";
+      let relationshipsFullText = "";
+      let reportsFullText = "";
+      
+      function splitJSONObjects(rawStr) {
+        const objects = [];
+        let depth = 0;
+        let start = 0;
+
+        for (let i = 0; i < rawStr.length; i++) {
+          if (rawStr[i] === '{') {
+            if (depth === 0) start = i;
+            depth++;
+          } else if (rawStr[i] === '}') {
+            depth--;
+            if (depth === 0) {
+              const objStr = rawStr.slice(start, i + 1);
+              try {
+                const obj = JSON.parse(objStr);
+                objects.push(obj);
+              } catch (e) {
+                console.error("JSON parse error:", objStr, e);
+              }
+            }
+          }
+        }
+
+        return objects;
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // const chunk = decoder.decode(value);
+        buffer += decoder.decode(value, { stream: true });
+        const parsed = splitJSONObjects(buffer);
+
+        parsed.forEach(obj => {
+          try {
+            if (obj.type === "response") {
+              responseFullText += obj.data;
+              responseBox.textContent = responseFullText;
+            }
+            else if (obj.type === "sources") {
+              sourcesFullText += obj.data;
+              sourcesBox.textContent = sourcesFullText;
+            }
+            else if (obj.type === "entities") {
+              entieisFullText += obj.data;
+              entitiesBox.textContent = entieisFullText;
+            }
+            else if (obj.type === "relationships") {
+              relationshipsFullText += obj.data;
+              relationshipsBox.textContent = relationshipsFullText;
+            }
+            else if (obj.type === "reports") {
+              reportsFullText += obj.data;
+              reportsBox.textContent = reportsFullText;
+            }
+          }
+          catch (e) {
+            console.error("JSON parse error", e);
+          }
+        });
+
+        // for (const line of lines) {
+        //   if (line.trim() === "") continue;
+        //   try {
+        //     const json = JSON.parse(line);
+        //     if (json.type === "response") {
+        //       // console.log("답변:", json.data);
+        //       responseFullText += chunk;
+        //       responseBox.textContent = responseFullText;
+        //     } else if (json.type === "source") {
+        //       // console.log(`소스 ${json.index}:`, json.data);
+        //       sourcesFullText += chunk;
+        //       sourcesBox.textContent = sourcesFullText;
+        //     }
+        //   } catch (e) {
+        //     console.error("JSON parse error", e);
+        //   }
+        // }
+
+      }
+    }
+  </script>
+</body>
+</html>

@@ -51,15 +51,15 @@ if __name__ == '__main__' :
     method = IndexingMethod.Standard
     if args.fast:
         method = IndexingMethod.Fast
-
+        
     # asyncio.run(indexing(config))
     indexing(config=config,
-             method=method, 
-             is_update_run=False,
-             verbose=True,
-             memprofile=False,
-             cache=True,
-             logger=logger,
-             dry_run=False,
-             skip_validation=False
+            method=method, 
+            is_update_run=False,
+            verbose=True,
+            memprofile=False,
+            cache=True,
+            logger=logger,
+            dry_run=False,
+            skip_validation=False
         )

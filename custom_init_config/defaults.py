@@ -19,8 +19,8 @@ from rag_lib.vector_stores.factory import VectorStoreType
 DEFAULT_OUTPUT_BASE_DIR = "output"
 DEFAULT_CHAT_MODEL_ID = "default_chat_model"
 DEFAULT_CHAT_MODEL_TYPE = ModelType.OpenAIChat
-### Options: "gpt-4-turbo-preview", "gpt-4o"
-DEFAULT_CHAT_MODEL = "gpt-4o"
+### Options: "gpt-4-turbo-preview", "gpt-4o", "gpt-4.1"
+DEFAULT_CHAT_MODEL = "gpt-4.1"
 DEFAULT_CHAT_MODEL_AUTH_TYPE = AuthType.APIKey
 DEFAULT_EMBEDDING_MODEL_ID = "default_embedding_model"
 DEFAULT_EMBEDDING_MODEL_TYPE = ModelType.OpenAIEmbedding
