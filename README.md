@@ -42,7 +42,7 @@ python indexing.py --system_config_path {system_config_path}
 Query
 =============
 
-### - Search
+### - RAG Search
    - Search method options: 'local', 'global', ...
 
 ```
