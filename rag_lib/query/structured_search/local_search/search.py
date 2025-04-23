@@ -37,6 +37,7 @@ class LocalSearch(BaseSearch[LocalContextBuilder]):
         self,
         model: ChatModel,
         context_builder: LocalContextBuilder,
+        language,
         token_encoder: tiktoken.Encoding | None = None,
         system_prompt: str | None = None,
         response_type: str = "multiple paragraphs",
@@ -51,6 +52,7 @@ class LocalSearch(BaseSearch[LocalContextBuilder]):
             model_params=model_params,
             context_builder_params=context_builder_params or {},
         )
+        self.language = language
         self.system_prompt = system_prompt or LOCAL_SEARCH_SYSTEM_PROMPT
         self.callbacks = callbacks or []
         self.response_type = response_type
@@ -88,6 +90,7 @@ class LocalSearch(BaseSearch[LocalContextBuilder]):
                 search_prompt = self.system_prompt.format(
                     context_data=context_result.context_chunks,
                     response_type=self.response_type,
+                    language=self.language
                 )
             history_messages = [
                 {"role": "system", "content": search_prompt},

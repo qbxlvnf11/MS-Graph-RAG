@@ -22,6 +22,8 @@ async def run_local_search(
     streaming: bool,
     web_streaming: bool,
     query: str,
+    language: str | None,
+    system_script: str | None
 ):
     """Perform a local search with a given query.
 
@@ -159,6 +161,8 @@ async def run_local_search(
             covariates=final_covariates,
             community_level=community_level,
             response_type=response_type,
+            language=language,
+            system_script=system_script,
             query=query,
         )
     

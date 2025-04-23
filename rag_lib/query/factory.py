@@ -42,8 +42,9 @@ def get_local_search_engine(
     relationships: list[Relationship],
     covariates: dict[str, list[Covariate]],
     response_type: str,
+    language: str,
     description_embedding_store: BaseVectorStore,
-    system_prompt: str | None = None,
+    system_prompt: str | None = None, 
     callbacks: list[QueryCallbacks] | None = None,
 ) -> LocalSearch:
     """Create a local search engine based on data + configuration."""
@@ -80,6 +81,7 @@ def get_local_search_engine(
     return LocalSearch(
         model=chat_model,
         system_prompt=system_prompt,
+        language=language,
         context_builder=LocalSearchMixedContext(
             community_reports=reports,
             text_units=text_units,

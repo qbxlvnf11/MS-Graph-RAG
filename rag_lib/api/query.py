@@ -340,6 +340,8 @@ async def local_search(
     covariates: pd.DataFrame | None,
     community_level: int,
     response_type: str,
+    language: str,
+    system_script: str,
     query: str,
     callbacks: list[QueryCallbacks] | None = None,
 ) -> tuple[
@@ -408,6 +410,8 @@ def local_search_streaming(
     community_level: int,
     response_type: str,
     query: str,
+    language: str,
+    system_script: str | None = None,
     callbacks: list[QueryCallbacks] | None = None,
 ) -> AsyncGenerator:
     """Perform a local search and return the context data and response via a generator.
@@ -445,7 +449,11 @@ def local_search_streaming(
 
     entities_ = read_indexer_entities(entities, communities, community_level)
     covariates_ = read_indexer_covariates(covariates) if covariates is not None else []
-    prompt = load_search_prompt(config.root_dir, config.local_search.prompt)
+    
+    if system_script is not None:
+        prompt = system_script
+    else:
+        prompt = load_search_prompt(config.root_dir, config.local_search.prompt)
 
     search_engine = get_local_search_engine(
         config=config,

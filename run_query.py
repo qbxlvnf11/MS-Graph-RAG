@@ -15,6 +15,10 @@ from core.global_query import run_global_search
 
 from utils import load_yaml
 
+from system_scripts.test_system_script import (
+   TEST_SYSTEM_PROMPT
+)
+
 logger = PrintProgressLogger("")
 
 def get_args():
@@ -24,6 +28,7 @@ def get_args():
         choices=['local', 'global'])
     parser.add_argument('--query', type=str, required=True)
     parser.add_argument('--system_config_path', type=str, required=True)
+    parser.add_argument('--language', type=str, default='Korean')
 
     return parser.parse_args()
 
@@ -57,6 +62,8 @@ if __name__ == '__main__' :
             streaming=streaming,
             web_streaming=web_streaming,
             query=query,
+            language=args.language,
+            system_script=TEST_SYSTEM_PROMPT
         ))
     elif args.search_method == 'global':
         response, context_data = asyncio.run(run_global_search(
